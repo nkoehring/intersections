@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="index.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <style>
+      body > header, body > footer {
+        text-align: center;
+        margin: 3rem 0;
+        font-size: 1.4rem;
+      }
+    </style>
+    <title>citadels — a strategy game</title>
+  </head>
+
+  <body>
+    <header><h1>Citadels</h1></header>
+
+    <div id="citadels">
+      <citadels-game></citadels-game>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#citadels',
+        components: { citadelsGame: citadels.default }
+      })
+    </script>
+
+    <footer>
+      citadels is open source and MIT licensed: <a href="https://github.com/nkoehring/citadels">source code</a><br>
+    </footer>
+    
+  </body>
+</html>

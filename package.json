@@ -1,0 +1,49 @@
+{
+  "name": "citadels",
+  "description": "a strategy game",
+  "version": "0.0.1",
+  "author": "koehr <n@koehr.in>",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
+    "build": "webpack --progress --hide-modules"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkoehring/citadels.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nkoehring/citadels/issues"
+  },
+  "homepage": "https://github.com/nkoehring/citadels#readme",
+  "keywords": [
+    "vue",
+    "vue2",
+    "game",
+    "strategy"
+  ],
+  "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.23.0",
+    "css-loader": "^0.28.0",
+    "style-loader": "^0.17.0",
+    "vue": "^2.2.4",
+    "vue-html-loader": "^1.2.4",
+    "vue-loader": "^12.0.3",
+    "vue-style-loader": "^3.0.1",
+    "vue-template-compiler": "^2.2.4",
+    "cross-env": "^3.0.0",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.2.1"
+  },
+  "browserify": {
+    "transform": [
+      "vueify"
+    ]
+  },
+  "dependencies": {
+    "babel-preset-latest": "^6.24.0"
+  }
+}
