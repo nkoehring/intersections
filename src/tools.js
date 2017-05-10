@@ -55,13 +55,14 @@ export const conquer = function conquer (source, target) {
   const diff = source.value - target.value
 
   if (diff > 0) {
-    if (target.value > 0) target.value = diff
-    else target.value = diff - 1
+    target.value = diff - 1
+    if (target.value < 1) target.value = 1
     source.value = 1
     target.owner = source.owner
 
   } else if (diff < 0) {
-    target.value = diff * -1
+    target.value = (diff - 1) * -1
+    if (target.value < 1) target.value = 1
     source.value = 1
 
   } else {
