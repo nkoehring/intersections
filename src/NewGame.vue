@@ -7,7 +7,7 @@
 
     <section name="opponents-settings" class="settings">
       <label for="opponents">Number of opponents:</label>
-      <input name="opponents" v-model="opponents" type="number" min="1" :max="maxOpponents" />
+      <input name="opponents" v-model="opponents" type="number" min="1" :max="value.maxOpponents" />
     </section>
 
     <section name="start" class="settings">
@@ -23,23 +23,20 @@ export default {
   data () {
     return {
       player: '',
-      opponents: 1,
-      maxOpponents: 1
+      opponents: 1
     }
   },
   beforeMount () {
     this.player = this.value.player
     this.opponents = this.value.opponents
-    this.maxOpponents = this.value.maxOpponents
   },
   methods: {
     emitSettings () {
-      this.$emit('input', {
+      this.$emit('input', Object.assign(this.value, {
         started: true,
         player: this.player,
-        opponents: this.opponents,
-        maxOpponents: this.maxOpponents
-      })
+        opponents: this.opponents
+      }))
     }
   }
 }

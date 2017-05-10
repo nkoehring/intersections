@@ -40,7 +40,7 @@ export default {
     }
   },
   beforeMount () {
-    this.citadels = populateField(this.rows, this.columns, this.settings.opponents + 1)
+    this.citadels = populateField(this.rows, this.columns, parseInt(this.settings.opponents) + 1)
 
     // DEBUG
     this.citadels[this.columns * 3 + 5] = {value:4, volume:5, selected:false, highlighted:false, owner:0}
