@@ -23,28 +23,21 @@
       />
     </g>
 
-    <g class="finish-round" @click="finishRound()">
-      <rect
-        :x="settings.width / 2 - 100"
-        :y="settings.height - 32"
-        width="200"
-        height="30"
-        rx="15"
-        ry="15"
-      />
-      <text :x="settings.width / 2 - 60" :y="settings.height - 11">finish round</text>
+    <g @click="finishRound()" :transform="`translate(${settings.width / 2 - 100},${settings.height - 32})`">
+      <svg-button label="finish round" />
     </g>
   </svg>
 </template>
 
 <script>
 import Citadel from './Citadel'
+import SvgButton from './Button'
 import { populateField, neighbours, conquer } from './tools'
 
 export default {
   name: 'citadels-field',
   props: [ 'settings' ],
-  components: { Citadel },
+  components: { Citadel, SvgButton },
   data () {
     return {
       distance: 80,
@@ -104,16 +97,17 @@ export default {
     background: #333;
   }
 
-  #field > g.finish-round { cursor: pointer; }
-  #field > g.finish-round:hover > rect { stroke-width: 2; }
-  #field > g.finish-round:hover > text { fill: #FFF; }
-  #field > g.finish-round > rect {
+  #field g.button { cursor: pointer; }
+  #field g.button:hover > rect { stroke-width: 2; }
+  #field g.button:hover > text { fill: #FFF; }
+  #field g.button > rect {
     stroke: #ccc;
     fill: transparent;
   }
-  #field > g.finish-round > text {
+  #field g.button > text {
     stroke: none;
     fill: #CCC;
     font-size: 1.8rem;
+    text-anchor: middle;
   }
 </style>
