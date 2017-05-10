@@ -10,16 +10,30 @@
       </g>
     </defs>
 
-    <citadel v-for="(c,i) in citadels" v-if="c"
-      :key="i"
-      :value="c.value"
-      :selected="c.selected"
-      :highlighted="c.highlighted"
-      :owner="c.owner"
-      :x="(i % columns) * distance + distance / 1.2"
-      :y="Math.floor(i / columns) * distance + distance / 2"
-      @selection="select(i)"
-    />
+    <g class="citadels">
+      <citadel v-for="(c,i) in citadels" v-if="c"
+        :key="i"
+        :value="c.value"
+        :selected="c.selected"
+        :highlighted="c.highlighted"
+        :owner="c.owner"
+        :x="(i % columns) * distance + distance / 1.2"
+        :y="Math.floor(i / columns) * distance + distance / 3"
+        @selection="select(i)"
+      />
+    </g>
+
+    <g class="finish-round">
+      <rect
+        :x="settings.width / 2 - 100"
+        :y="settings.height - 32"
+        width="200"
+        height="30"
+        rx="15"
+        ry="15"
+      />
+      <text :x="settings.width / 2 - 60" :y="settings.height - 11">finish round</text>
+    </g>
   </svg>
 </template>
 
@@ -41,11 +55,6 @@ export default {
   },
   beforeMount () {
     this.citadels = populateField(this.rows, this.columns, parseInt(this.settings.opponents) + 1)
-
-    // DEBUG
-    this.citadels[this.columns * 3 + 5] = {value:4, volume:5, selected:false, highlighted:false, owner:0}
-    this.citadels[this.columns * 3 + 4] = {value:5, volume:5, selected:false, highlighted:false, owner:1}
-    this.citadels[this.columns * 3 + 6] = {value:2, volume:5, selected:false, highlighted:false, owner:1}
   },
   computed: {
     columns () {
@@ -89,5 +98,18 @@ export default {
     width: 100%;
     height: 100%;
     background: #333;
+  }
+
+  #field > g.finish-round { cursor: pointer; }
+  #field > g.finish-round:hover > rect { stroke: #FFF; stroke-width: 2; }
+  #field > g.finish-round:hover > text { fill: #FFF; }
+  #field > g.finish-round > rect {
+    stroke: #ccc;
+    fill: transparent;
+  }
+  #field > g.finish-round > text {
+    stroke: none;
+    fill: #CCC;
+    font-size: 1.8rem;
   }
 </style>

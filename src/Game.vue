@@ -2,7 +2,6 @@
   <div id="game">
     <new-game v-model="settings" v-if="!settings.started" />
     <field :settings="settings" v-if="settings.started" />
-    <button class="finish-round" @click="finishRound()" v-if="settings.started">finish round</button>
   </div>
 </template>
 
@@ -18,7 +17,7 @@ export default {
       settings: {
         width: 960,
         height: 600,
-        started: false,
+        started: true,
         player: 'Anon McNoface',
         opponents: 3,
         maxOpponents: 3
