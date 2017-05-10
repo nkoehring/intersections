@@ -17,10 +17,9 @@ export default {
       settings: {
         width: 960,
         height: 600,
-        started: true,
-        player: 'Anon McNoface',
-        opponents: 3,
-        maxOpponents: 3
+        started: false,
+        players: ['Anon McNoface'],
+        currentPlayer: 0
       }
     }
   }

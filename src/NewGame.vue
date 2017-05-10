@@ -1,41 +1,41 @@
 <template>
   <div id="menu">
-    <section name="player-settings" class="settings">
-      <label for="player">Player Name:</label>
-      <input name="player" v-model="player" />
+    <section class="settings" :class="{active: players[i-1]}" v-for="i in maxPlayers">
+      <label :for="`player${i}`">Player {{i}}:</label>
+      <input :name="`player${i}`" v-model="players[i-1]" />
     </section>
 
-    <section name="opponents-settings" class="settings">
-      <label for="opponents">Number of opponents:</label>
-      <input name="opponents" v-model="opponents" type="number" min="1" :max="value.maxOpponents" />
-    </section>
-
-    <section name="start" class="settings">
-      <button @click="emitSettings">new game</button>
-    </section>
+    <button @click="emitSettings" :disabled="amountPlayers < 2">new game</button>
   </div>
 </template>
 
 <script>
+import { MAX_PLAYERS } from './tools'
+
 export default {
   name: 'citadels-menu',
   props: [ 'value' ],
   data () {
     return {
-      player: '',
-      opponents: 1
+      players: new Array(MAX_PLAYERS),
+      maxPlayers: MAX_PLAYERS
     }
   },
   beforeMount () {
-    this.player = this.value.player
-    this.opponents = this.value.opponents
+    this.players = this.value.players
+  },
+  computed: {
+    amountPlayers () {
+      return this.players.filter(x => x).length
+    }
   },
   methods: {
     emitSettings () {
+      if (this.amountPlayers < 2) return
+
       this.$emit('input', Object.assign(this.value, {
         started: true,
-        player: this.player,
-        opponents: this.opponents
+        players: this.players.filter(x => x)
       }))
     }
   }
@@ -50,19 +50,13 @@ export default {
     font-size: 2rem;
     text-align: center;
   }
-  section.settings {
-    margin: 2rem 0;
-  }
-  section.settings > button {
+  section.settings { margin: 2rem 0; opacity: .7; }
+  section.settings:hover, section.settings.active { margin: 2rem 0; opacity: 1; }
+  section.settings > input { width: 25rem; }
+  #menu > button {
     display: block;
     width: 20%;
     height: 2em;
     margin: 2em auto;
-  }
-  section.settings > input[name="player"] {
-    width: 25rem;
-  }
-  section.settings > input[name="opponents"] {
-    width: 15rem;
   }
 </style>

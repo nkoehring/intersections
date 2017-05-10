@@ -1,5 +1,5 @@
+export const MAX_PLAYERS = 4
 const CITADEL_ODDS = 0.2
-const MAX_PLAYERS = 4
 const INITIAL_POWER = 2
 const STANDARD_VOLUME = 5
 const EXTENDED_VOLUME = 8

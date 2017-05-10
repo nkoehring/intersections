@@ -23,7 +23,7 @@
       />
     </g>
 
-    <g class="finish-round">
+    <g class="finish-round" @click="finishRound()">
       <rect
         :x="settings.width / 2 - 100"
         :y="settings.height - 32"
@@ -54,7 +54,7 @@ export default {
     }
   },
   beforeMount () {
-    this.citadels = populateField(this.rows, this.columns, parseInt(this.settings.opponents) + 1)
+    this.citadels = populateField(this.rows, this.columns, this.settings.players.length)
   },
   computed: {
     columns () {
@@ -87,6 +87,10 @@ export default {
         this.selection = null
         this.neighbours = []
       }
+    },
+    finishRound () {
+      const energy = this.citadels.filter(c => c.owner === 0).length
+      console.log(energy)
     }
   }
 }
@@ -101,7 +105,7 @@ export default {
   }
 
   #field > g.finish-round { cursor: pointer; }
-  #field > g.finish-round:hover > rect { stroke: #FFF; stroke-width: 2; }
+  #field > g.finish-round:hover > rect { stroke-width: 2; }
   #field > g.finish-round:hover > text { fill: #FFF; }
   #field > g.finish-round > rect {
     stroke: #ccc;
