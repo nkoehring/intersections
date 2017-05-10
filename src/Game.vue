@@ -15,9 +15,11 @@ export default {
   data () {
     return {
       settings: {
+        width: 960,
+        height: 600,
         started: true,
         player: 'Anon McNoface',
-        opponents: 1,
+        opponents: 3,
         maxOpponents: 3
       }
     }

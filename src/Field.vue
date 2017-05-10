@@ -1,6 +1,6 @@
 <template>
-  <svg id="field" viewBox='0 0 960 600' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
-    <citadel v-for="(c,i) in citadels"
+  <svg id="field" :viewBox='`0 0 ${settings.width} ${settings.height}`' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+    <citadel v-for="(c,i) in citadels" v-if="c"
       :key="i"
       :value="c.value"
       :selected="c.selected"
@@ -14,9 +14,11 @@
 
 <script>
 import Citadel from './Citadel'
+import { populateField } from './tools'
 
 export default {
   name: 'citadels-field',
+  props: [ 'settings' ],
   components: { Citadel },
   data () {
     return {
@@ -25,16 +27,14 @@ export default {
     }
   },
   beforeMount () {
-    let i = this.rows * this.columns
-    for(; i; i--)
-      this.citadels.push({ value: Math.floor(Math.random() * 10), selected: false, owner: Math.round(Math.random()) })
+    this.citadels = populateField(this.rows, this.columns, this.settings.opponents + 1)
   },
   computed: {
     columns () {
-      return Math.floor(960 / this.distance) - 1
+      return Math.floor(this.settings.width / this.distance) - 1
     },
     rows () {
-      return Math.floor(600 / this.distance)
+      return Math.floor(this.settings.height / this.distance)
     }
   },
   methods: {

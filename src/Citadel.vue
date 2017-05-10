@@ -1,8 +1,7 @@
 <template>
-  <g class="citadel" :class="{ selected, [`player${owner}`]: true }" @click="selection()" :transform="`translate(${x},${y})`">
-    <polygon points="10,0 20,0 30,10 30,20 20,30 10,30 0,20 0,10">
-    </polygon>
-    <text x="9" y="22">{{ value }}</text>
+  <g class="citadel" :class="{ selected, [`player${owner}`]: owner !== null}" @click="selection()" :transform="`translate(${x},${y})`">
+    <polygon points="10,0 20,0 30,10 30,20 20,30 10,30 0,20 0,10" />
+    <text x="9" y="22.5">{{ value }}</text>
   </g>
 </template>
 
@@ -15,7 +14,6 @@ export default {
   },
   methods: {
     selection () {
-      console.log('selection', this.owner)
       if (this.owner === 0) this.$emit('selection')
     }
   }
@@ -26,7 +24,7 @@ export default {
   g.citadel { cursor: default; }
   g.citadel.player0 { cursor: pointer; }
   g.citadel > polygon {
-    stroke: white;
+    stroke: #888;
     stroke-width: 2;
     fill: transparent;
   }
@@ -35,7 +33,9 @@ export default {
     fill: white;
     font-size: 2.0rem;
   }
-  g.citadel.selected > polygon { fill: #282; }
-  g.citadel.player0 > polygon { stroke: #AAF; }
-  g.citadel.player1 > polygon { stroke: #AFA; }
+  g.citadel.selected > polygon { fill: #06F; }
+  g.citadel.player0 > polygon { stroke: #06F; }
+  g.citadel.player1 > polygon { stroke: #0F6; }
+  g.citadel.player2 > polygon { stroke: #F60; }
+  g.citadel.player3 > polygon { stroke: #60F; }
 </style>
