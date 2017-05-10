@@ -36,7 +36,6 @@ export default {
   #game {
     width: 96rem;
     height: 60rem;
-    border: .1rem dotted #333;
     margin: 3rem auto;
   }
 </style>
