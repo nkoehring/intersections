@@ -31,9 +31,20 @@ export default {
   }
   g.citadel.highlighted { cursor: pointer; }
   g.citadel.highlighted > use { fill: #336; stroke: #FFF; }
-  g.citadel.selected > use { fill: #06F; }
+
   g.citadel.player0 > use { stroke: #06F; }
   g.citadel.player1 > use { stroke: #0F6; }
   g.citadel.player2 > use { stroke: #F60; }
   g.citadel.player3 > use { stroke: #60F; }
+
+  g.citadel.player0.selected > use { fill: #06F; }
+  g.citadel.player1.selected > use { fill: #0F6; }
+  g.citadel.player2.selected > use { fill: #F60; }
+  g.citadel.player3.selected > use { fill: #60F; }
+
+  g.citadel.player0.highlighted > use { stroke: #FFF; }
+  g.citadel.player1.highlighted > use { stroke: #FFF; }
+  g.citadel.player2.highlighted > use { stroke: #FFF; }
+  g.citadel.player3.highlighted > use { stroke: #FFF; }
+
 </style>

@@ -24,7 +24,7 @@
     </g>
 
     <g @click="finishRound()" :transform="`translate(${settings.width / 2 - 100},${settings.height - 32})`">
-      <svg-button label="finish round" />
+      <svg-button :label="finishRoundLabel" />
     </g>
   </svg>
 </template>
@@ -43,7 +43,9 @@ export default {
       distance: 80,
       citadels: [],
       selection: null,
-      neighbours: []
+      neighbours: [],
+      mode: 'conquer', // 'conquer' or 'recharge'
+      energy: 0
     }
   },
   beforeMount () {
@@ -55,6 +57,12 @@ export default {
     },
     rows () {
       return Math.floor(this.settings.height / this.distance)
+    },
+    finishRoundLabel () {
+      if (this.mode === 'conquer')
+        return 'finish round'
+      else
+        return this.energy > 0 ? `spend ${this.energy} points` : 'next player'
     }
   },
   methods: {
@@ -67,23 +75,66 @@ export default {
       }
     },
     select (i) {
-      this.reset()
+      const citadel = this.citadels[i]
+      const ownedByPlayer = citadel.owner === this.settings.currentPlayer
 
-      if (this.selection === null && this.citadels[i].owner === 0 && this.citadels[i].value > 1) {
-        this.selection = i
-        this.citadels[i].selected = true
-        this.neighbours = neighbours(i, this.columns, this.citadels)
-        this.neighbours.forEach(c => this.citadels[c].highlighted = true)
+      if (this.mode === 'conquer') {
+        const nothingSelected = this.selection === null
+        const notSelection = this.selection !== i
+        const hasValue = citadel.value > 1
+        const isNeighbour = this.neighbours.indexOf(i) >= 0
 
-      } else if (this.neighbours.indexOf(i) >= 0) {
-        conquer(this.citadels[this.selection], this.citadels[i])
-        this.selection = null
-        this.neighbours = []
+        if (nothingSelected && ownedByPlayer && hasValue) {
+          this.reset()
+          this.selection = i
+          citadel.selected = true
+          this.neighbours = neighbours(i, this.columns, this.citadels)
+          this.neighbours.forEach(c => {
+            const citadel  = this.citadels[c]
+            citadel.highlighted = citadel.owner !== this.settings.currentPlayer
+          })
+
+        } else if (notSelection && !ownedByPlayer && isNeighbour) {
+          conquer(this.citadels[this.selection], this.citadels[i])
+          this.reset()
+          this.selection = null
+          this.neighbours = []
+
+        } else if (!notSelection) {
+          this.reset()
+          this.selection = null
+          this.neighbours = []
+        }
+
+      } else {
+        const isNotFull = citadel.value < citadel.volume
+
+        if (ownedByPlayer && this.energy && isNotFull) {
+          citadel.value += 1
+          this.energy -= 1
+          citadel.highlighted = citadel.value < citadel.volume
+        }
       }
     },
     finishRound () {
-      const energy = this.citadels.filter(c => c.owner === 0).length
-      console.log(energy)
+      this.reset()
+
+      if (this.mode === 'conquer') {
+        this.mode = 'recharge'
+
+        let energy = 0
+        this.citadels.forEach(c => {
+          if (c.owner === this.settings.currentPlayer) {
+            energy++
+            c.highlighted = c.value < c.volume
+          }
+        })
+
+        this.energy = energy
+
+      } else {
+        this.mode = 'conquer'
+      }
     }
   }
 }
