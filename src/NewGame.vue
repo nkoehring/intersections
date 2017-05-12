@@ -5,6 +5,9 @@
       <input :name="`player${i}`" v-model="players[i-1]" />
     </section>
 
+    <section class="settings">
+      <label><input type="checkbox" v-model="quickstart" /> quick start</label>
+    </section>
     <button @click="emitSettings" :disabled="amountPlayers < 2">new game</button>
   </div>
 </template>
@@ -18,7 +21,8 @@ export default {
   data () {
     return {
       players: new Array(MAX_PLAYERS),
-      maxPlayers: MAX_PLAYERS
+      maxPlayers: MAX_PLAYERS,
+      quickstart: false
     }
   },
   beforeMount () {
@@ -35,7 +39,8 @@ export default {
 
       this.$emit('input', Object.assign(this.value, {
         started: true,
-        players: this.players.filter(x => x)
+        players: this.players.filter(x => x),
+        quickstart: this.quickstart
       }))
     }
   }

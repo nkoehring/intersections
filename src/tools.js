@@ -30,7 +30,7 @@ export const neighbours = function neighbours (i, columns, citadels) {
   return result.filter(n => 0 !== false && citadels[n])
 }
 
-export const populateField = function populateField (rows, columns, players) {
+export const populateField = function populateField (rows, columns, players, quickstart) {
   const n = rows * columns
   let i;
   let citadels = new Array(n)
@@ -45,7 +45,7 @@ export const populateField = function populateField (rows, columns, players) {
   for(i = 0; i < players; i++) {
     let pos = playerPositions[i]
     citadels[pos].owner = i
-    citadels[pos].value = INITIAL_POWER
+    citadels[pos].value = quickstart ? STANDARD_VOLUME : INITIAL_POWER
   }
 
   return citadels

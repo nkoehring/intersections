@@ -18,7 +18,8 @@ export default {
         width: 960,
         height: 600,
         started: false,
-        players: ['Anon McNoface']
+        quickstart: false,
+        players: ['Anon McNoface', 'Foo Foosen']
       }
     }
   }

@@ -60,7 +60,12 @@ export default {
     }
   },
   beforeMount () {
-    this.citadels = populateField(this.rows, this.columns, this.settings.players.length)
+    this.citadels = populateField(
+      this.rows,
+      this.columns,
+      this.settings.players.length,
+      this.settings.quickstart
+    )
   },
   computed: {
     columns () {
@@ -115,7 +120,7 @@ export default {
           this.neighbours = []
 
         // citadel gets overloaded
-        } else if (notSelection && ownedByPlayer && isNeighbour /* && canOverload */) {
+        } else if (notSelection && ownedByPlayer && isNeighbour && canOverload) {
           const selection = this.citadels[this.selection]
           citadel.value += selection.value - 1
           selection.value = 1
