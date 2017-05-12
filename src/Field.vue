@@ -24,13 +24,17 @@
       />
     </g>
 
-    <g class="player-info" :transform="`translate(200,${settings.height - 12})`">
-      <text>Player {{ currentPlayer }}: {{ settings.players[currentPlayer] }}</text>
-      <line x1="-90" x2="90" y1="12" y2="12" :stroke="playerColors[currentPlayer]" />
+    <g class="player-info" :transform="`translate(${settings.width / 3},${settings.height - 12})`">
+      <text>
+         <tspan v-for="(player,i) in settings.players" :class="{ 'current-player': i === currentPlayer }"> {{ player }} </tspan>
+      </text>
+      <line :x1="-settings.width/5" :x2="settings.width/5" y1="10" y2="10" :stroke="playerColors[currentPlayer]" />
     </g>
 
-    <g @click="finishRound()" :transform="`translate(${settings.width - 200},${settings.height - 32})`">
-      <svg-button :label="finishRoundLabel" />
+    <g @click="finishRound()" :transform="`translate(${settings.width - 300},${settings.height - 32})`">
+      <svg-button label="finish round" v-if="mode === 'conquer'" />
+      <svg-button :label="`spend ${points[currentPlayer]} points`" v-else-if="points[currentPlayer] > 0" />
+      <svg-button label="next player" v-else />
     </g>
   </svg>
 </template>
@@ -56,10 +60,14 @@ export default {
       selection: null,
       neighbours: [],
       mode: 'conquer', // 'conquer' or 'recharge'
-      energy: 0
+      points: {}
     }
   },
   beforeMount () {
+    this.settings.players.forEach((p,i) => {
+      this.points[i] = 0
+    })
+
     this.citadels = populateField(
       this.rows,
       this.columns,
@@ -77,8 +85,10 @@ export default {
     finishRoundLabel () {
       if (this.mode === 'conquer')
         return 'finish round'
+      else if (this.points[this.currentPlayer])
+        return `spend ${this.points[this.currentPlayer]} points`
       else
-        return this.energy > 0 ? `spend ${this.energy} points` : 'next player'
+        return 'next player'
     }
   },
   methods: {
@@ -142,9 +152,9 @@ export default {
       } else {
         const isNotFull = citadel.value < STANDARD_VOLUME
 
-        if (ownedByPlayer && this.energy && isNotFull) {
+        if (ownedByPlayer && this.points[this.currentPlayer] > 0 && isNotFull) {
           citadel.value += 1
-          this.energy -= 1
+          this.points[this.currentPlayer] -= 1
           citadel.highlighted = citadel.value < STANDARD_VOLUME
         }
       }
@@ -155,15 +165,11 @@ export default {
       if (this.mode === 'conquer') {
         this.mode = 'recharge'
 
-        let energy = 0
+        for(let p in this.points) this.points[p] = 0
         this.citadels.forEach(c => {
-          if (c.owner === this.currentPlayer) {
-            energy++
-            c.highlighted = c.value < STANDARD_VOLUME
-          }
+          this.points[c.owner]++
+          c.highlighted = c.owner === this.currentPlayer && c.value < STANDARD_VOLUME
         })
-
-        this.energy = energy
 
       } else {
         const decay = EXTENDED_VOLUME_DECAY
@@ -202,6 +208,16 @@ export default {
     fill: #CCC;
     font-size: 1.8rem;
     text-anchor: middle;
+  }
+  #field g.player-info > text > tspan {
+    z-index: 0;
+    opacity: .5;
+    font-size: 1.4rem;
+  }
+  #field g.player-info > text > tspan.current-player {
+    z-index: 1;
+    opacity: 1;
+    font-size: 2rem;
   }
   #field g.player-info > line {
     stroke-width: 3;

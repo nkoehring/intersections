@@ -19,7 +19,7 @@ export default {
         height: 600,
         started: false,
         quickstart: false,
-        players: ['Anon McNoface', 'Foo Foosen']
+        players: ['Anon McNoface', 'Foo Foosen', 'Marky Mark', 'Berta Block']
       }
     }
   }
