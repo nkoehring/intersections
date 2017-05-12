@@ -1,6 +1,6 @@
 <template>
   <g class="citadel"
-    :class="{ selected, highlighted, ownedByPlayer, owned: owner !== null, overloaded: value > volume}"
+    :class="{ selected, highlighted, ownedByPlayer, owned: owner !== null, overloaded: value > standardVolume}"
     @click="$emit('selection')" :transform="`translate(${x},${y})`"
   >
     <use xlink:href="#citadel-walls" :style="{stroke: color, fill, strokeWidth: highlighted ? value * 2 : value}" filter="url(#grid-filter)" />
@@ -11,11 +11,12 @@
 </template>
 
 <script>
-import { PLAYER_COLORS } from './tools'
+import { PLAYER_COLORS, STANDARD_VOLUME } from './tools'
 
 export default {
   name: 'citadels-intersection',
-  props: [ 'owner', 'ownedByPlayer', 'value', 'volume', 'selected', 'highlighted', 'x', 'y' ],
+  props: [ 'owner', 'ownedByPlayer', 'value', 'selected', 'highlighted', 'x', 'y' ],
+  data () { return {standardVolume: STANDARD_VOLUME} },
   computed: {
     color () { return PLAYER_COLORS[this.owner] },
     fill () {

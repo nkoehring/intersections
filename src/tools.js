@@ -1,14 +1,13 @@
 export const MAX_PLAYERS = 4
 export const PLAYER_COLORS = ['#06F', '#0F6', '#F60', '#60F']
+export const STANDARD_VOLUME = 5
+export const EXTENDED_VOLUME = 20
+export const EXTENDED_VOLUME_DECAY = 5
+
 const CITADEL_ODDS = 0.2
-const INITIAL_POWER = 50
-const STANDARD_VOLUME = 5
-const EXTENDED_VOLUME = 20
-const EXTENDED_VOLUME_DECAY_MULTIPLIER = 0.5
+const INITIAL_POWER = 2
 const CITADEL_MODEL = {
   value: 0,
-  volume: STANDARD_VOLUME,
-  maxOverload: EXTENDED_VOLUME,
   selected: false,
   highlighted: false,
   owner: null

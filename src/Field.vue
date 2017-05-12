@@ -14,7 +14,6 @@
       <citadel v-for="(c,i) in citadels" v-if="c"
         :key="i"
         :value="c.value"
-        :volume="c.volume"
         :selected="c.selected"
         :highlighted="c.highlighted"
         :owner="c.owner"
@@ -39,7 +38,10 @@
 <script>
 import Citadel from './Citadel'
 import SvgButton from './Button'
-import { populateField, neighbours, conquer, PLAYER_COLORS } from './tools'
+import {
+  populateField, neighbours, conquer,
+  PLAYER_COLORS, STANDARD_VOLUME, EXTENDED_VOLUME, EXTENDED_VOLUME_DECAY
+} from './tools'
 
 export default {
   name: 'citadels-field',
@@ -91,7 +93,7 @@ export default {
         const nothingSelected = this.selection === null
         const notSelection = this.selection !== i
         const hasValue = citadel.value > 1
-        const canOverload = citadel.value >= citadel.volume && citadel.value < citadel.maxOverload
+        const canOverload = citadel.value >= STANDARD_VOLUME && citadel.value < EXTENDED_VOLUME
         const isNeighbour = this.neighbours.indexOf(i) >= 0
 
         // citadel of player activated
@@ -121,9 +123,9 @@ export default {
           this.selection = null
           this.neighbours = []
 
-          if (citadel.value > citadel.maxOverload) {
-            selection.value += (citadel.value - citadel.maxOverload)
-            citadel.value = citadel.maxOverload
+          if (citadel.value > EXTENDED_VOLUME) {
+            selection.value += (citadel.value - EXTENDED_VOLUME)
+            citadel.value = EXTENDED_VOLUME
           }
 
         } else if (!notSelection) {
@@ -133,12 +135,12 @@ export default {
         }
 
       } else {
-        const isNotFull = citadel.value < citadel.volume
+        const isNotFull = citadel.value < STANDARD_VOLUME
 
         if (ownedByPlayer && this.energy && isNotFull) {
           citadel.value += 1
           this.energy -= 1
-          citadel.highlighted = citadel.value < citadel.volume
+          citadel.highlighted = citadel.value < STANDARD_VOLUME
         }
       }
     },
@@ -152,15 +154,23 @@ export default {
         this.citadels.forEach(c => {
           if (c.owner === this.currentPlayer) {
             energy++
-            c.highlighted = c.value < c.volume
+            c.highlighted = c.value < STANDARD_VOLUME
           }
         })
 
         this.energy = energy
 
       } else {
+        const decay = EXTENDED_VOLUME_DECAY
         this.currentPlayer = (this.currentPlayer + 1) % this.settings.players.length
         this.mode = 'conquer'
+
+        // overloaded citadels loose value every round
+        this.citadels.forEach(c => {
+          if (c.owner === this.currentPlayer && c.value > STANDARD_VOLUME) {
+            c.value -= (c.value - decay) % decay || decay
+          }
+        })
       }
     }
   }
