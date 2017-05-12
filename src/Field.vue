@@ -26,7 +26,9 @@
 
     <g class="player-info" :transform="`translate(${settings.width / 3},${settings.height - 12})`">
       <text>
-         <tspan v-for="(player,i) in settings.players" :class="{ 'current-player': i === currentPlayer }"> {{ player }} </tspan>
+         <tspan v-for="(player,i) in settings.players" :class="{ 'current-player': i === currentPlayer, dead: points[i] <= 0 }">
+           {{ player }}
+         </tspan>
       </text>
       <line :x1="-settings.width/5" :x2="settings.width/5" y1="10" y2="10" :stroke="playerColors[currentPlayer]" />
     </g>
@@ -65,7 +67,7 @@ export default {
   },
   beforeMount () {
     this.settings.players.forEach((p,i) => {
-      this.points[i] = 0
+      this.points[i] = 1
     })
 
     this.citadels = populateField(
@@ -211,13 +213,17 @@ export default {
   }
   #field g.player-info > text > tspan {
     z-index: 0;
-    opacity: .5;
+    opacity: .7;
     font-size: 1.4rem;
   }
   #field g.player-info > text > tspan.current-player {
     z-index: 1;
     opacity: 1;
     font-size: 2rem;
+  }
+  #field g.player-info > text > tspan.dead {
+    opacity: .5;
+    text-decoration: line-through;
   }
   #field g.player-info > line {
     stroke-width: 3;
