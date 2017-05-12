@@ -1,4 +1,5 @@
 export const MAX_PLAYERS = 4
+export const PLAYER_COLORS = ['#06F', '#0F6', '#F60', '#60F']
 const CITADEL_ODDS = 0.2
 const INITIAL_POWER = 2
 const STANDARD_VOLUME = 5

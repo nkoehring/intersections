@@ -17,13 +17,19 @@
         :selected="c.selected"
         :highlighted="c.highlighted"
         :owner="c.owner"
+        :ownedByPlayer="c.owner === currentPlayer"
         :x="(i % columns) * distance + distance / 1.2"
         :y="Math.floor(i / columns) * distance + distance / 3"
         @selection="select(i)"
       />
     </g>
 
-    <g @click="finishRound()" :transform="`translate(${settings.width / 2 - 100},${settings.height - 32})`">
+    <g class="player-info" :transform="`translate(200,${settings.height - 12})`">
+      <text>Player {{ currentPlayer }}: {{ settings.players[currentPlayer] }}</text>
+      <line x1="-90" x2="90" y1="12" y2="12" :stroke="playerColors[currentPlayer]" />
+    </g>
+
+    <g @click="finishRound()" :transform="`translate(${settings.width - 200},${settings.height - 32})`">
       <svg-button :label="finishRoundLabel" />
     </g>
   </svg>
@@ -32,7 +38,7 @@
 <script>
 import Citadel from './Citadel'
 import SvgButton from './Button'
-import { populateField, neighbours, conquer } from './tools'
+import { populateField, neighbours, conquer, PLAYER_COLORS } from './tools'
 
 export default {
   name: 'citadels-field',
@@ -40,8 +46,10 @@ export default {
   components: { Citadel, SvgButton },
   data () {
     return {
+      playerColors: PLAYER_COLORS,
       distance: 80,
       citadels: [],
+      currentPlayer: 0,
       selection: null,
       neighbours: [],
       mode: 'conquer', // 'conquer' or 'recharge'
@@ -76,7 +84,7 @@ export default {
     },
     select (i) {
       const citadel = this.citadels[i]
-      const ownedByPlayer = citadel.owner === this.settings.currentPlayer
+      const ownedByPlayer = citadel.owner === this.currentPlayer
 
       if (this.mode === 'conquer') {
         const nothingSelected = this.selection === null
@@ -91,7 +99,7 @@ export default {
           this.neighbours = neighbours(i, this.columns, this.citadels)
           this.neighbours.forEach(c => {
             const citadel  = this.citadels[c]
-            citadel.highlighted = citadel.owner !== this.settings.currentPlayer
+            citadel.highlighted = citadel.owner !== this.currentPlayer
           })
 
         } else if (notSelection && !ownedByPlayer && isNeighbour) {
@@ -124,7 +132,7 @@ export default {
 
         let energy = 0
         this.citadels.forEach(c => {
-          if (c.owner === this.settings.currentPlayer) {
+          if (c.owner === this.currentPlayer) {
             energy++
             c.highlighted = c.value < c.volume
           }
@@ -133,6 +141,7 @@ export default {
         this.energy = energy
 
       } else {
+        this.currentPlayer = (this.currentPlayer + 1) % this.settings.players.length
         this.mode = 'conquer'
       }
     }
@@ -155,10 +164,13 @@ export default {
     stroke: #ccc;
     fill: transparent;
   }
-  #field g.button > text {
+  #field text {
     stroke: none;
     fill: #CCC;
     font-size: 1.8rem;
     text-anchor: middle;
+  }
+  #field g.player-info > line {
+    stroke-width: 3;
   }
 </style>
