@@ -14,6 +14,7 @@
       <citadel v-for="(c,i) in citadels" v-if="c"
         :key="i"
         :value="c.value"
+        :volume="c.volume"
         :selected="c.selected"
         :highlighted="c.highlighted"
         :owner="c.owner"
@@ -90,8 +91,10 @@ export default {
         const nothingSelected = this.selection === null
         const notSelection = this.selection !== i
         const hasValue = citadel.value > 1
+        const canOverload = citadel.value >= citadel.volume && citadel.value < citadel.maxOverload
         const isNeighbour = this.neighbours.indexOf(i) >= 0
 
+        // citadel of player activated
         if (nothingSelected && ownedByPlayer && hasValue) {
           this.reset()
           this.selection = i
@@ -102,11 +105,26 @@ export default {
             citadel.highlighted = citadel.owner !== this.currentPlayer
           })
 
+        // neighbouring citadel attacked
         } else if (notSelection && !ownedByPlayer && isNeighbour) {
           conquer(this.citadels[this.selection], this.citadels[i])
           this.reset()
           this.selection = null
           this.neighbours = []
+
+        // citadel gets overloaded
+        } else if (notSelection && ownedByPlayer && isNeighbour /* && canOverload */) {
+          const selection = this.citadels[this.selection]
+          citadel.value += selection.value - 1
+          selection.value = 1
+          this.reset()
+          this.selection = null
+          this.neighbours = []
+
+          if (citadel.value > citadel.maxOverload) {
+            selection.value += (citadel.value - citadel.maxOverload)
+            citadel.value = citadel.maxOverload
+          }
 
         } else if (!notSelection) {
           this.reset()

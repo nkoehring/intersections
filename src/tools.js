@@ -1,12 +1,14 @@
 export const MAX_PLAYERS = 4
 export const PLAYER_COLORS = ['#06F', '#0F6', '#F60', '#60F']
 const CITADEL_ODDS = 0.2
-const INITIAL_POWER = 2
+const INITIAL_POWER = 50
 const STANDARD_VOLUME = 5
-const EXTENDED_VOLUME = 8
+const EXTENDED_VOLUME = 20
+const EXTENDED_VOLUME_DECAY_MULTIPLIER = 0.5
 const CITADEL_MODEL = {
   value: 0,
   volume: STANDARD_VOLUME,
+  maxOverload: EXTENDED_VOLUME,
   selected: false,
   highlighted: false,
   owner: null
@@ -26,7 +28,7 @@ export const neighbours = function neighbours (i, columns, citadels) {
     notLeftCorner && i + columns - 1,  // below left
     notRightCorner && i + columns + 1  // below right
   ]
-  return result.filter(n => n && citadels[n])
+  return result.filter(n => 0 !== false && citadels[n])
 }
 
 export const populateField = function populateField (rows, columns, players) {
