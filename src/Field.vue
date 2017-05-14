@@ -1,6 +1,8 @@
 <template>
   <div id="winner" v-if="winner">
-    <h1>{{ winner }} wins!</h1>
+    <h1 v-show="winner === settings.players[0]">YOU WIN!</h1>
+    <h1 v-show="winner !== settings.players[0]">{{ winner }} wins</h1>
+    <h2 v-show="winner !== settings.players[0]">you lose</h2>
     <button @click="restart()">back to menu</button>
   </div>
   <svg v-else id="field" :viewBox='`0 0 ${settings.width} ${settings.height}`' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
@@ -101,7 +103,7 @@ export default {
     },
     initialize () {
       this.reset()
-      this.winner = null
+      this.winner = false
       this.settings.players.forEach((p,i) => {
         this.points[i] = 1
       })
@@ -259,11 +261,16 @@ export default {
     stroke-width: 3;
   }
 
-  #winner > h1 {
+  #winner > h1, #winner > h2 {
+    margin: 2em 0;
+    font-size: 3em;
     text-align: center;
     color: #f5f5f5;
-    text-shadow: 0px -2px 4px #fff, 0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33;
+    text-shadow: 0 0 1px #000, 0px -2px 4px #fff, 0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33;
     animation: fire 2s infinite;
+  }
+  #winner > h2 {
+    animation-delay: .2s;
   }
   #winner > button {
     display: block;
@@ -271,11 +278,11 @@ export default {
     margin: 5rem auto;
   }
   @keyframes fire {
-    0%  { text-shadow:  0px -2px 4px #fff,  0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
-    20% { text-shadow: -2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
-    40% { text-shadow: -3px -2px 4px #fff, -3px -2px 10px #FF3, 0px  -8px 20px #F90, 0px -18px 40px #C33; },
-    60% { text-shadow:  2px -2px 4px #fff, -3px -2px 10px #FF3, 0px -10px 20px #F90, 0px -18px 40px #C33; },
-    80% { text-shadow:  2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
-    100%{ text-shadow:  2px -2px 4px #fff,  2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; }
+    0%  { text-shadow:  0px  0px 1px #000,  0px -2px 4px #fff,  0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    20% { text-shadow: -1px  0px 1px #000, -2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    40% { text-shadow: -1px -1px 1px #000, -3px -2px 4px #fff, -3px -2px 10px #FF3, 0px  -8px 20px #F90, 0px -18px 40px #C33; },
+    60% { text-shadow:  1px  1px 1px #000,  2px -2px 4px #fff, -3px -2px 10px #FF3, 0px -10px 20px #F90, 0px -18px 40px #C33; },
+    80% { text-shadow:  0px  1px 1px #000,  2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    100%{ text-shadow:  0px  0px 1px #000,  2px -2px 4px #fff,  2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; }
   }
 </style>
