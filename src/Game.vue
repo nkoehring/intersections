@@ -1,8 +1,6 @@
 <template>
-  <div id="game">
-    <new-game v-model="settings" v-if="!settings.started" />
-    <field :settings="settings" v-if="settings.started" />
-  </div>
+  <new-game v-model="settings" v-if="!settings.started" />
+  <field :settings="settings" @stop="settings.started = false" v-else />
 </template>
 
 <script>
@@ -12,14 +10,16 @@ import Field from './Field'
 export default {
   name: 'citadels',
   components: { NewGame, Field },
+  props: [ 'hub' ],
   data () {
     return {
       settings: {
+        started: false,
         width: 960,
         height: 600,
-        started: false,
         quickstart: false,
-        players: ['Anon McNoface', 'Foo Foosen', 'Marky Mark', 'Berta Block']
+        players: [],
+        recordId: null,
       }
     }
   }
@@ -27,18 +27,18 @@ export default {
 </script>
 
 <style>
-  html,body,#game {
+  html,body,#citadels {
     font: 10px monospace;
     line-height: 10px;
   }
 
-  #game {
+  #citadels {
     width: 96rem;
     height: 60rem;
     margin: 3rem auto;
   }
 
-  #game > button.finish-round {
+  #citadels > button.finish-round {
     display: block;
     margin: auto;
   }

@@ -1,6 +1,6 @@
 export const MAX_PLAYERS = 4
 export const PLAYER_COLORS = ['#06F', '#0F6', '#F60', '#60F']
-export const STANDARD_VOLUME = 5
+export const STANDARD_VOLUME = 25
 export const EXTENDED_VOLUME = 20
 export const EXTENDED_VOLUME_DECAY = 5
 
@@ -11,6 +11,35 @@ const CITADEL_MODEL = {
   selected: false,
   highlighted: false,
   owner: null
+}
+
+const NAMES = [
+  "jimmy",
+  "henry",
+  "carl",
+  "robert",
+  "hubertus",
+  "frederic"
+]
+
+const ADJECTIVES = [
+  "juicy",
+  "handsome",
+  "colorful",
+  "robust",
+  "harmful",
+  "frenzy"
+]
+
+export const randomName = function randomName () {
+  const aRnd = Math.floor(Math.random() * ADJECTIVES.length)
+  const nRnd = Math.floor(Math.random() * NAMES.length)
+  return `${ADJECTIVES[aRnd]} ${NAMES[nRnd]}`
+}
+export const randomRecordId = function randomRecordId () {
+  const name = randomName().replace(' ', '-')
+  const rnd = Math.floor(Math.random() * 46655).toString(36)
+  return `${name}-${rnd}`.toUpperCase()
 }
 
 export const neighbours = function neighbours (i, columns, citadels) {

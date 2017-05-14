@@ -1,5 +1,9 @@
 <template>
-  <svg id="field" :viewBox='`0 0 ${settings.width} ${settings.height}`' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <div id="winner" v-if="winner">
+    <h1>{{ winner }} wins!</h1>
+    <button @click="restart()">back to menu</button>
+  </div>
+  <svg v-else id="field" :viewBox='`0 0 ${settings.width} ${settings.height}`' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
     <defs>
       <filter id="grid-filter" filterUnits="userSpaceOnUse" x="-5%" y="-5%" width="110%" height="110%">
         <feGaussianBlur in="StrokePaint" stdDeviation="10" />
@@ -26,7 +30,7 @@
 
     <g class="player-info" :transform="`translate(${settings.width / 3},${settings.height - 12})`">
       <text>
-         <tspan v-for="(player,i) in settings.players" :class="{ 'current-player': i === currentPlayer, dead: points[i] <= 0 }">
+         <tspan v-for="(player,i) in settings.players" :class="{ 'current-player': i === currentPlayer, dead: points[i] === null }">
            {{ player }}
          </tspan>
       </text>
@@ -62,20 +66,13 @@ export default {
       selection: null,
       neighbours: [],
       mode: 'conquer', // 'conquer' or 'recharge'
-      points: {}
+      points: {},
+      winner: false
     }
   },
   beforeMount () {
-    this.settings.players.forEach((p,i) => {
-      this.points[i] = 1
-    })
-
-    this.citadels = populateField(
-      this.rows,
-      this.columns,
-      this.settings.players.length,
-      this.settings.quickstart
-    )
+    this.reset()
+    this.initialize()
   },
   computed: {
     columns () {
@@ -101,6 +98,24 @@ export default {
         c.selected = false
         c.highlighted = false
       }
+    },
+    initialize () {
+      this.reset()
+      this.winner = null
+      this.settings.players.forEach((p,i) => {
+        this.points[i] = 1
+      })
+
+      this.citadels = populateField(
+        this.rows,
+        this.columns,
+        this.settings.players.length,
+        this.settings.quickstart
+      )
+    },
+    restart () {
+      this.initialize()
+      this.$emit('stop')
     },
     select (i) {
       const citadel = this.citadels[i]
@@ -155,8 +170,8 @@ export default {
         const isNotFull = citadel.value < STANDARD_VOLUME
 
         if (ownedByPlayer && this.points[this.currentPlayer] > 0 && isNotFull) {
-          citadel.value += 1
-          this.points[this.currentPlayer] -= 1
+          citadel.value++
+          this.points[this.currentPlayer]--
           citadel.highlighted = citadel.value < STANDARD_VOLUME
         }
       }
@@ -169,9 +184,24 @@ export default {
 
         for(let p in this.points) this.points[p] = 0
         this.citadels.forEach(c => {
+          if (c.owner === null) return
           this.points[c.owner]++
           c.highlighted = c.owner === this.currentPlayer && c.value < STANDARD_VOLUME
         })
+
+        // filter out dead players
+        for(let p in this.points)
+          if (this.points[p] === 0) this.points[p] = null
+
+        let playersLeft = []
+        for(let p in this.points) {
+          p = parseInt(p)
+          if (this.points[p] !== null) playersLeft.push(p)
+        }
+
+        if (playersLeft.length < 2) {
+          this.winner = this.settings.players[playersLeft[0]]
+        }
 
       } else {
         const decay = EXTENDED_VOLUME_DECAY
@@ -227,5 +257,25 @@ export default {
   }
   #field g.player-info > line {
     stroke-width: 3;
+  }
+
+  #winner > h1 {
+    text-align: center;
+    color: #f5f5f5;
+    text-shadow: 0px -2px 4px #fff, 0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33;
+    animation: fire 2s infinite;
+  }
+  #winner > button {
+    display: block;
+    width: 20rem;
+    margin: 5rem auto;
+  }
+  @keyframes fire {
+    0%  { text-shadow:  0px -2px 4px #fff,  0px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    20% { text-shadow: -2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    40% { text-shadow: -3px -2px 4px #fff, -3px -2px 10px #FF3, 0px  -8px 20px #F90, 0px -18px 40px #C33; },
+    60% { text-shadow:  2px -2px 4px #fff, -3px -2px 10px #FF3, 0px -10px 20px #F90, 0px -18px 40px #C33; },
+    80% { text-shadow:  2px -2px 4px #fff, -2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; },
+    100%{ text-shadow:  2px -2px 4px #fff,  2px -2px 10px #FF3, 0px -10px 20px #F90, 0px -20px 40px #C33; }
   }
 </style>
