@@ -1,28 +1,29 @@
 <template>
   <div id="menu">
     <section class="settings player-name">
-      <label for="player0">Your Name</label>
-      <input name="player0" v-model.trim="players[0]" />
+      <label for="player">Your Name</label>
+      <input name="player" v-model.trim="playerName" />
     </section>
     <section class="settings record-id" v-if="!offlineMode">
       <label for="record-id">Game Name</label>
       <input name="record-id" type="text" pattern="[A-Za-z0-9_-]{3,23}" v-model.trim="recordId" />
-      <button @click="connect()" :disabled="players[0].length < 2">connect</button>
+      <button @click="$emit('connect', {recordId, playerName})" :disabled="playerName.length < 2 || recordId.length < 2">connect</button>
     </section>
     <button class="linkish" @click="offlineMode = !offlineMode">play {{ offlineMode ? 'on' : 'off' }}line</button>
 
-    <div v-show="value.recordId || offlineMode">
+    <div v-show="value.dataHub || offlineMode">
       <hr />
-      <section class="settings" v-for="(player,i) in players.slice(1)">
-        <label for="`player${i+1}`">Player {{i+2}}</label>
-        <input name="`player${i+1}`" v-model.trim="players[i+1]" :disabled="!offlineMode" />
+      <div id='waiting-message' v-show="!offlineMode && players.length < 1">waiting for other players to connect</div>
+      <section class="settings" v-for="(player,i) in players">
+        <label for="`player${i}`">Player {{i+2}}</label>
+        <input name="`player${i}`" v-model.trim="players[i]" :disabled="!offlineMode" />
       </section>
 
-      <button @click="players.push(randomName())" v-if="players.length < maxPlayers">add player</button>
+      <button @click="opponents.push(randomName())" v-if="offlineMode && opponents.length < maxPlayers">add player</button>
 
       <section class="settings quickstart start">
         <label><input type="checkbox" v-model="quickstart" /> quick start</label>
-        <button @click="startNewGame()" :disabled="players.length < 2">new game</button>
+        <button @click="startNewGame()" :disabled="playerName.length < 2 || players.length < 1">new game</button>
       </section>
     </div>
   </div>
@@ -33,28 +34,33 @@ import { MAX_PLAYERS, randomRecordId, randomName } from './tools'
 
 export default {
   name: 'citadels-menu',
-  props: [ 'value' ],
+  props: [ 'value', 'hub' ],
   data () {
     return {
-      players: [randomName()],
+      playerName: randomName(),
+      opponents: [], // for offline mode
       maxPlayers: MAX_PLAYERS,
       quickstart: false,
       offlineMode: false,
       recordId: randomRecordId()
     }
   },
-  beforeMount () {
+  computed: {
+    players () {
+      return this.offlineMode ? this.opponents : this.value.players
+    }
   },
   methods: {
     randomName,
     startNewGame () {
+      const players = this.players.slice()
+      players.unshift(this.playerName)
+
       this.$emit('input', Object.assign(this.value, {
         started: true,
-        players: this.players,
-        quickstart: this.quickstart
+        quickstart: this.quickstart,
+        players
       }))
-    },
-    connect () {
     }
   }
 }
@@ -99,5 +105,18 @@ export default {
     background: transparent;
     text-decoration: underline;
     color: #EEE;
+  }
+  #waiting-message {
+    display: block;
+    margin: 2em 0;
+    font-size: 1em;
+    line-height: 2em;
+    transform: scale(0.2);
+    animation: waiting-message 20s infinite alternate;
+  }
+  @keyframes waiting-message {
+    0% { transform: scale(0.2); }
+    10% { transform: scale(0.8); }
+    100% { transform: scale(1.0); }
   }
 </style>
