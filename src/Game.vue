@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import { genClientId, MAX_PLAYERS } from './tools'
 import NewGame from './NewGame'
 import Field from './Field'
 
@@ -13,6 +14,10 @@ export default {
   props: [ 'hub' ],
   data () {
     return {
+      clientId: this.hub.getUid(),
+      hubPrefix: 'citadel/',
+      record: null,
+
       settings: {
         started: false,
         width: 960,
@@ -20,29 +25,33 @@ export default {
         quickstart: false,
         players: [],
         playerId: 0,
-        dataHub: null
       }
     }
   },
   methods: {
+    subscribe (name, callback) {
+      this.hub.event.subscribe(this.hubPrefix + name, callback)
+    },
+    publish (name, action, value) {
+      this.hub.event.emit(this.hubPrefix + name, {client: this.clientId, action, value})
+    },
     connect (payload) {
       const { recordId, playerName } = payload
       console.log('connecting to citadel/' + recordId.toUpperCase() + ' with player ' + playerName)
 
-      const record = this.hub.record.getRecord('citadel/' + recordId.toUpperCase())
-      this.settings.dataHub = record
+      this.hubPrefix += recordId.toUpperCase() + '/'
 
-      console.log('players', record.get('players'))
-      this.players = record.get('players') || []
-      this.players.push(playerName)
-      this.playerId = this.players.length - 1
+      this.record = this.hub.record.get(this.hubPrefix + 'state')
 
-      record.set('players', this.players)
-      record.subscribe(data => {
-        console.log('DATA UPDATE', data)
-        this.players = data.players
+      this.subscribe('player', data => {
+        console.log('event player', data)
+        const { client, action, value } = data
+
+        if (client === this.clientId) return // ignore our own events
+        if (action === 'sign-on') this.players.push(value)
       })
 
+      this.publish('player', 'sign-on', playerName)
     }
   }
 }

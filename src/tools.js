@@ -23,7 +23,7 @@ const NAMES = [
 ]
 
 const ADJECTIVES = [
-  "juicy",
+  "joyful",
   "handsome",
   "colorful",
   "robust",
@@ -40,6 +40,11 @@ export const randomRecordId = function randomRecordId () {
   const name = randomName().replace(' ', '-')
   const rnd = Math.floor(Math.random() * 46655).toString(36)
   return `${name}-${rnd}`.toUpperCase()
+}
+
+export const genClientId = function genClientId () {
+  // results in a string like 9e1g.6ldp0axlt1lx72e29
+  return (46656 + Math.random() * 1632959).toString(36)
 }
 
 export const neighbours = function neighbours (i, columns, citadels) {
