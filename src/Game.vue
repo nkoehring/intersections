@@ -1,6 +1,14 @@
 <template>
-  <new-game v-model="settings" @connect="connect($event)" v-if="!settings.started" />
-  <field :settings="settings" @stop="settings.started = false" v-else />
+  <new-game v-if="!running"
+    :settings="settings"
+    @connect="connect($event)"
+    @start="start($event)"
+    @signOn="signOn($event)"
+  />
+  <field v-else
+    :settings="settings"
+    @stop="stop()"
+  />
 </template>
 
 <script>
@@ -16,10 +24,12 @@ export default {
     return {
       clientId: this.hub.getUid(),
       hubPrefix: 'citadel/',
-      record: null,
+      gameState: null,
+      players: null,
+      gameOwner: false,
+      running: false,
 
       settings: {
-        started: false,
         width: 960,
         height: 600,
         quickstart: false,
@@ -29,11 +39,16 @@ export default {
     }
   },
   methods: {
-    subscribe (name, callback) {
-      this.hub.event.subscribe(this.hubPrefix + name, callback)
+    signOn (player) {
+      if (this.running || this.settings.players.length >= MAX_PLAYERS) return
+      console.log('OFFLINE SIGN ON', player)
+      this.settings.players.push(player)
     },
-    publish (name, action, value) {
-      this.hub.event.emit(this.hubPrefix + name, {client: this.clientId, action, value})
+    signOff (player) {
+      console.log('OFFLINE SIGN OFF', player)
+      const players = this.settings.players
+      players.splice(players.indexOf(value), 1)
+      this.settings.players = players
     },
     connect (payload) {
       const { recordId, playerName } = payload
@@ -41,17 +56,53 @@ export default {
 
       this.hubPrefix += recordId.toUpperCase() + '/'
 
-      this.record = this.hub.record.get(this.hubPrefix + 'state')
+      this.players = this.hub.record.getList(this.hubPrefix + 'players')
+      this.gameState = this.hub.record.getRecord(this.hubPrefix + 'state')
 
-      this.subscribe('player', data => {
-        console.log('event player', data)
-        const { client, action, value } = data
+      this.players.subscribe(players => {
+        const newPlayerList = []
+        players.forEach(p => {
+          console.log('loading player', p)
+          const record = this.hub.record.getRecord(p)
+          record.whenReady(r => {
+            console.log('loaded player', p, r.get())
+            newPlayerList.push(r.get('name'))
+          })
+        })
 
-        if (client === this.clientId) return // ignore our own events
-        if (action === 'sign-on') this.players.push(value)
+        this.settings.players = newPlayerList
+        // this.settings.players.length = MAX_PLAYERS
+      })
+      this.gameState.subscribe(settings => {
+        this.settings.quickstart = settings.quickstart
+        this.running = settings.running
       })
 
-      this.publish('player', 'sign-on', playerName)
+      // first come first serve!
+      if (this.players.isEmpty()) {
+        this.gameOwner = true
+        console.log('YEAH, GAME OWNER', playerName, this.clientId)
+      }
+
+      this.hub.record.getRecord(this.hubPrefix + this.clientId).whenReady(r => r.set('name', playerName))
+      this.players.addEntry(this.hubPrefix + this.clientId)
+    },
+    start ({ quickstart, playerName }) {
+      this.settings.quickstart = !!quickstart
+
+      if (!this.gameState) { // offline mode
+        this.settings.players.unshift(playerName)
+        this.running = true
+      } else {
+        this.gameState.set({quickstart, running: true})
+      }
+    },
+    stop () {
+      if (!this.gameState) { // offline mode
+        this.running = false
+      } else {
+        this.gameState.set('running', false)
+      }
     }
   }
 }

@@ -11,19 +11,21 @@
     </section>
     <button class="linkish" @click="offlineMode = !offlineMode">play {{ offlineMode ? 'on' : 'off' }}line</button>
 
-    <div v-show="value.dataHub || offlineMode">
+    <div v-show="settings.players.length > 1 || offlineMode">
       <hr />
-      <div id='waiting-message' v-show="!offlineMode && players.length < 1">waiting for other players to connect</div>
-      <section class="settings" v-for="(player,i) in players">
-        <label for="`player${i}`">Player {{i+2}}</label>
-        <input name="`player${i}`" v-model.trim="players[i]" :disabled="!offlineMode" />
+      <div id='waiting-message' v-show="!offlineMode && settings.players.length < 2">waiting for other players to connect</div>
+      <section class="settings" v-for="(player,i) in settings.players" v-if="i">
+        <label for="`player${i}`">Player {{i}}</label>
+        <input name="`player${i}`" v-model.trim="settings.players[i]" disabled="disabled" />
       </section>
 
-      <button @click="opponents.push(randomName())" v-if="offlineMode && opponents.length < maxPlayers">add player</button>
+      <button v-if="offlineMode" @click="$emit('signOn', randomName())">
+        add player
+      </button>
 
       <section class="settings quickstart start">
         <label><input type="checkbox" v-model="quickstart" /> quick start</label>
-        <button @click="startNewGame()" :disabled="playerName.length < 2 || players.length < 1">new game</button>
+        <button @click="startNewGame()" :disabled="playerName.length < 2 || settings.players.length < 1">new game</button>
       </section>
     </div>
   </div>
@@ -34,33 +36,22 @@ import { MAX_PLAYERS, randomRecordId, randomName } from './tools'
 
 export default {
   name: 'citadels-menu',
-  props: [ 'value', 'hub' ],
+  props: [ 'settings', 'hub' ],
   data () {
     return {
       playerName: randomName(),
-      opponents: [], // for offline mode
-      maxPlayers: MAX_PLAYERS,
       quickstart: false,
       offlineMode: false,
       recordId: randomRecordId()
     }
   },
-  computed: {
-    players () {
-      return this.offlineMode ? this.opponents : this.value.players
-    }
-  },
   methods: {
     randomName,
     startNewGame () {
-      const players = this.players.slice()
-      players.unshift(this.playerName)
-
-      this.$emit('input', Object.assign(this.value, {
-        started: true,
-        quickstart: this.quickstart,
-        players
-      }))
+      this.$emit('start', {
+        playerName: this.playerName,
+        quickstart: this.quickstart
+      })
     }
   }
 }
